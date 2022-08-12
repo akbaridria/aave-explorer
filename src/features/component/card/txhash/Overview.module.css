@@ -1,0 +1,17 @@
+.contentTx {
+    display: grid;
+    grid-template-columns: 300px auto;
+    padding: 12px 12px 12px 12px;
+    font-size: 14px;
+}
+.successBadge {
+    padding: 6px;
+    color: #00c9a7;
+    background-color: rgba(0,201,167,.1);
+    max-width: 80px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: row;
+    gap:4px;
+    align-items: center;
+}

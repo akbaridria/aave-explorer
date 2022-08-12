@@ -1,0 +1,31 @@
+.wrapper {
+    box-shadow: 0 0.5rem 1.2rem rgb(189 197 209 / 20%);
+    border: 1px solid #e7eaf3;
+    border-radius: 8px;
+}
+
+.tab {
+    display: flex;
+    flex-direction: row;
+    border-bottom: 1px solid #e7eaf3;
+    font-weight: bold;
+    cursor: pointer;
+    gap: 32px;
+    font-size: 16px;
+}
+
+.activeTab {
+    padding: 0px 12px 12px 12px;
+    border-bottom : 1px solid #3498db;
+    color: #3498db;
+}
+.inActiveTab {
+    padding: 0px 12px 12px 12px;
+    border-bottom : 1px solid #e7eaf3;
+    color: black;
+}
+.contentTx {
+    display: grid;
+    grid-template-columns: 300px auto;
+    padding: 32px 12px 12px 12px;
+}

@@ -1,0 +1,13 @@
+.App {
+  margin: 0 auto;
+  max-width: 1440px;
+  padding-top: 150px;
+}
+
+.customHR {
+    margin-top: 0;
+    margin-bottom: 0;
+    opacity: .75;
+    border: 0;
+    border-top: 1px solid #e7eaf3;
+}

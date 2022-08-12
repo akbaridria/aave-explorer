@@ -1,0 +1,20 @@
+.cardContainer {
+    box-shadow: 0 0.5rem 1.2rem rgb(189 197 209 / 20%);
+    border-radius: 8px;
+    padding: 24px;
+    border: 1px solid #e7eaf3;
+}
+
+.rowTop {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.rowTopIcon {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+}
