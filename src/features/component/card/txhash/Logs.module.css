@@ -1,0 +1,14 @@
+.componentEvents {
+    display: grid;
+    grid-template-columns: 100px auto;
+    padding: 12px 0px;
+    gap: 24px;
+}
+
+.badgeNumber {
+    color: #77838f;
+    background-color: rgba(119,131,143,.1);
+    text-align: center;
+    border-radius: 8px;
+    font-size: 12px;
+}

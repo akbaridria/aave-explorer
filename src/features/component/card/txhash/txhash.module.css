@@ -10,7 +10,7 @@
     border-bottom: 1px solid #e7eaf3;
     font-weight: bold;
     cursor: pointer;
-    gap: 32px;
+    /* gap: 32px; */
     font-size: 16px;
 }
 
@@ -18,11 +18,13 @@
     padding: 0px 12px 12px 12px;
     border-bottom : 1px solid #3498db;
     color: #3498db;
+    padding: 12px 32px;
 }
 .inActiveTab {
     padding: 0px 12px 12px 12px;
     border-bottom : 1px solid #e7eaf3;
     color: black;
+    padding: 12px 32px;
 }
 .contentTx {
     display: grid;

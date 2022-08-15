@@ -455,8 +455,6 @@ export function queryBorrow(id: string) {
         avg(price) as price
     from
         ethereum.core.fact_hourly_token_prices
-    where
-        hour::date = current_date - 1
     group by 1, 2, 3, 4
   )
   , data_borrow as (
@@ -474,7 +472,8 @@ export function queryBorrow(id: string) {
     null as amount_usd1,
     'Borrow' as action
   from
-    ethereum.core.fact_event_logs a join data_price b on a.event_inputs:reserve = b.token_address
+    ethereum.core.fact_event_logs a join data_price b on a.block_timestamp::date  = b.date
+    and a.event_inputs:reserve = b.token_address
   where
       a.contract_address = '0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9'
   and
@@ -497,8 +496,6 @@ export function querySupply(id: string) {
         avg(price) as price
     from
         ethereum.core.fact_hourly_token_prices
-    where
-        hour::date = current_date - 1
     group by 1, 2, 3, 4
   )
   , data_supply as (
@@ -516,7 +513,8 @@ export function querySupply(id: string) {
         null as amount_usd1,
         'Supply' as action
     from
-        ethereum.core.fact_event_logs a join data_price b on a.event_inputs:reserve = b.token_address
+        ethereum.core.fact_event_logs a join data_price b on a.block_timestamp::date = b.date
+      and a.event_inputs:reserve = b.token_address
     where
         a.contract_address = '0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9'
     and
@@ -539,8 +537,6 @@ export function queryWithdraw(id: string) {
         avg(price) as price
     from
         ethereum.core.fact_hourly_token_prices
-    where
-        hour::date = current_date - 1
     group by 1, 2, 3, 4
   )
   , data_withdraw as (
@@ -557,7 +553,8 @@ export function queryWithdraw(id: string) {
         null as amount1,
         null as amount_usd1,
         'Withdraw' as action
-    from ethereum.core.fact_event_logs a join data_price b on a.event_inputs:token = b.token_address
+    from ethereum.core.fact_event_logs a join data_price b on a.block_timestamp::date = b.date
+    and a.event_inputs:token = b.token_address
     where
       a.contract_address = '0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9'
     and
@@ -580,8 +577,6 @@ export function queryRepay(id: string) {
         avg(price) as price
     from
         ethereum.core.fact_hourly_token_prices
-    where
-        hour::date = current_date - 1
     group by 1, 2, 3, 4
   )
   , data_repay as (
@@ -599,7 +594,8 @@ export function queryRepay(id: string) {
         null as amount_usd1,
         'Repay' as action
     from
-        ethereum.core.fact_event_logs a join data_price b on a.event_inputs:vault = b.token_address
+        ethereum.core.fact_event_logs a join data_price b on a.block_timestamp::date = b.date
+      and a.event_inputs:vault = b.token_address
     where
         a.contract_address = '0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9'
     and
@@ -622,8 +618,6 @@ export function queryFlashLoan(id: string) {
         avg(price) as price
     from
         ethereum.core.fact_hourly_token_prices
-    where
-        hour::date = current_date - 1
     group by 1, 2, 3, 4
   )
   , data_flashloan as (
@@ -641,7 +635,8 @@ export function queryFlashLoan(id: string) {
         null as amount_usd1,
         'FlashLoan' as action
     from
-        ethereum.core.fact_event_logs a join data_price b on a.event_inputs:asset = b.token_address
+        ethereum.core.fact_event_logs a join data_price b on a.block_timestamp::date = b.date
+      and a.event_inputs:asset = b.token_address
     where
         a.contract_address = '0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9'
     and
@@ -664,8 +659,6 @@ export function queryLiquidation(id: string) {
         avg(price) as price
     from
         ethereum.core.fact_hourly_token_prices
-    where
-      hour::date = CURRENT_DATE - 1
     group by 1, 2, 3, 4
   )
   , data_liquidation as (
@@ -682,9 +675,9 @@ export function queryLiquidation(id: string) {
         try_to_number(a.event_inputs:debtToCover::string)/pow(10, c.decimals) as amount1,
         (try_to_number(a.event_inputs:debtToCover::string)/pow(10, c.decimals))*c.price as amount_usd1,
         'Liquidation' as action
-    from ethereum.core.fact_event_logs a join data_price b on
-    a.event_inputs:collateralAsset = b.token_address
-    join data_price c on a.event_inputs:debtAsset = c.token_address
+    from ethereum.core.fact_event_logs a join data_price b on a.block_timestamp::date = b.date
+    and a.event_inputs:collateralAsset = b.token_address
+    join data_price c on a.event_inputs:debtAsset = c.token_address 
     where
         a.contract_address = '0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9'
     and
@@ -696,7 +689,10 @@ export function queryLiquidation(id: string) {
 
   return query
 }
-
+export function queryEventLogs(id: string) {
+  const query = `select * from ethereum.core.fact_event_logs where tx_hash = '${id}' order by event_index asc`
+  return query
+}
 export function queryTx(id: string) {
   const query = `select * from ethereum.core.fact_transactions where tx_hash = '${id}'`
   return query
