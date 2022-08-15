@@ -3,7 +3,16 @@ import styles from '../txhash/Overview.module.css'
 import { AiFillCheckCircle, AiOutlineCaretRight } from 'react-icons/ai'
 import { BiTime } from 'react-icons/bi'
 import { getAll } from '../../../../data/DataQuery'
-import { getSearch } from '../../../../data/RawQuery'
+import {
+    queryBorrow,
+    querySupply,
+    queryFlashLoan,
+    queryWithdraw,
+    queryRepay,
+    queryLiquidation,
+    queryTx,
+    queryTokenTransfer
+} from '../../../../data/RawQuery'
 import { Oval } from 'react-loader-spinner'
 import { HiExternalLink } from 'react-icons/hi'
 
@@ -12,17 +21,33 @@ import { HiExternalLink } from 'react-icons/hi'
 export function Overview({ id }: { id: string }) {
     const [isLoading, setLoading] = useState(false)
     const [result, setResult] = useState([[]])
+    const [tokenTransfers, setTokenTransfers] = useState([[]])
+    const [tx, setTx] = useState([[]])
 
     useEffect(() => {
         const getValues = async () => {
             setLoading(true)
-            const d = await getAll(getSearch(id))
-            setResult(d as any[])
+            const d = await getAll(queryBorrow(id))
+            const e = await getAll(querySupply(id))
+            const f = await getAll(queryWithdraw(id))
+            const g = await getAll(queryRepay(id))
+            const h = await getAll(queryFlashLoan(id))
+            const i = await getAll(queryLiquidation(id))
+            const temp = [...d, ...e, ...f, ...g, ...h, ...i]
+            setResult(temp as any[])
+            if (temp.length > 0) {
+                const i = await getAll(queryTx(id))
+                const j = await getAll(queryTokenTransfer(id))
+                console.log('tx', i)
+                console.log('token transfers', j)
+                setTokenTransfers(j as any[])
+                setTx(i as any)
+            }
             setLoading(false)
         }
 
         getValues()
-    }, [])
+    }, [id])
 
     return (
         <>
@@ -63,36 +88,47 @@ export function Overview({ id }: { id: string }) {
                                     </div>
                                     <div className={styles.contentTx}>
                                         <div>Block Number : </div>
-                                        <div>{result[0][0]} </div>
+                                        <div>{tx[0][0]}</div>
                                     </div>
                                     {/* divider */}
                                     <hr className='customHR' />
                                     {/* divider */}
                                     <div className={styles.contentTx}>
                                         <div>From Address : </div>
-                                        <a href={'https://etherscan.io/address/' + result[0][19]} style={{ textDecoration: 'none', color: '#3498db' }}>{result[0][19]}  <HiExternalLink /></a>
+                                        <a href={'https://etherscan.io/address/' + result[0][19]} style={{ textDecoration: 'none', color: '#3498db' }}>{tx[0][7]}  <HiExternalLink /></a>
                                     </div>
                                     <div className={styles.contentTx}>
                                         <div>Interact With (To) : </div>
-                                        <a href={'https://etherscan.io/address/' + result[0][19]} style={{ textDecoration: 'none', color: '#3498db' }}>{result[0][20]}  <HiExternalLink /></a>
+                                        <a href={'https://etherscan.io/address/' + result[0][19]} style={{ textDecoration: 'none', color: '#3498db' }}>{tx[0][8]}  <HiExternalLink /></a>
                                     </div>
                                     {/* divider */}
                                     <hr className='customHR' />
                                     {/* divider */}
                                     <div className={styles.contentTx}>
-                                        <div>Transaction Actions : </div>
-                                        {
-                                            result[0][11] === 'Liquidation' ? (
-                                                <div>
-                                                    <div style={{ color: '#77838f', padding: '8px 0px' }}>Liquidator Repay <span style={{ color: 'black' }}>{result[0][9]}</span> <span style={{ color: '#3498db' }}>${result[0][8]}</span> From AAVE Protocol V2</div>
-                                                    <div style={{ color: '#77838f' }}>{result[0][11]} <span style={{ color: 'black' }}>{result[0][6]}</span> <span style={{ color: '#3498db' }}>${result[0][4]}</span> From AAVE Protocol V2</div>
-                                                </div>
-                                            ) : (
-                                                <div>
-                                                    <div style={{ color: '#77838f' }}>{result[0][11]} <span style={{ color: 'black' }}>{result[0][6]}</span> <span style={{ color: '#3498db' }}>${result[0][4]}</span> From AAVE Protocol V2</div>
-                                                </div>
-                                            )
-                                        }
+                                        <div>Transaction Actions : </div><div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                            {
+                                                result.map((item, id) => {
+                                                    return (
+                                                        item[11] === 'Liquidation' ? (
+
+                                                            <div key={id}>
+                                                                <div style={{ color: '#77838f', padding: '8px 0px' }}>Liquidator Repay <span style={{ color: 'black' }}>{Intl.NumberFormat('en-IN').format(item[9] as number)}</span> <span style={{ color: '#3498db' }}>${item[8]}</span> From AAVE Protocol V2</div>
+                                                                <div style={{ color: '#77838f' }}>{item[11]} <span style={{ color: 'black' }}>{Intl.NumberFormat('en-IN').format(item[6] as number)}</span> <span style={{ color: '#3498db' }}>${item[4]}</span> From AAVE Protocol V2</div>
+                                                            </div>
+                                                        ) : (
+
+                                                            <div key={id}>
+                                                                <div style={{ color: '#77838f' }}>{item[11]} <span style={{ color: 'black' }}>{Intl.NumberFormat('en-in').format(item[6] as number)}</span> <span style={{ color: '#3498db' }}>${item[4]}</span> From AAVE Protocol V2</div>
+                                                            </div>
+
+                                                        )
+
+                                                    )
+
+                                                })
+
+
+                                            }</div>
                                     </div>
                                     {/* divider */}
                                     <hr className='customHR' />
@@ -100,16 +136,16 @@ export function Overview({ id }: { id: string }) {
                                     <div className={styles.contentTx}>
                                         <div>Token Transfers : </div>
                                         <div>{
-                                            result.map((item, id) => {
+                                            tokenTransfers.map((item, id) => {
                                                 return (
                                                     <div key={id} style={{ display: 'grid', gridTemplateColumns: '20px 40px 100px 20px 100px 30px auto', padding: '8px 0px' }}>
                                                         <AiOutlineCaretRight style={{ fontSize: '14px' }} />
                                                         <div style={{ color: 'black', fontWeight: 'bold' }}>From</div>
-                                                        <div style={{ color: '#3498db' }}>{(item[14] as string)?.slice(0, 5) + '...' + (item[14] as string)?.slice(-5)}</div>
+                                                        <div style={{ color: '#3498db' }}>{(item[7] as string)?.slice(0, 5) + '...' + (item[7] as string)?.slice(-5)}</div>
                                                         <div style={{ color: 'black', fontWeight: 'bold' }}>To</div>
-                                                        <div style={{ color: '#3498db' }}>{(item[15] as string)?.slice(0, 5) + '...' + (item[15] as string)?.slice(-5)}</div>
+                                                        <div style={{ color: '#3498db' }}>{(item[8] as string)?.slice(0, 5) + '...' + (item[8] as string)?.slice(-5)}</div>
                                                         <div style={{ color: 'black', fontWeight: 'bold' }}>For</div>
-                                                        <div style={{ color: 'black' }}>{(item[17] as number)?.toFixed(6)}  <span style={{ color: '#3498db' }}>${item[16]}</span></div>
+                                                        <div style={{ color: 'black' }}>{Intl.NumberFormat('en-IN').format(item[13] as number)}  <span style={{ color: '#3498db' }}>${item[11]}</span></div>
 
                                                     </div>
                                                 )
@@ -121,12 +157,10 @@ export function Overview({ id }: { id: string }) {
                                     <hr className='customHR' />
                                     {/* divider */}
                                     <div className={styles.contentTx}>
-                                        <div>Value : </div>
-                                        <div>{result[0][12]} </div>
+                                        <div>Value : </div><div>{Intl.NumberFormat('en-IN').format(tx[0][9] as number)} Ether </div>
                                     </div>
                                     <div className={styles.contentTx}>
-                                        <div>Transactions Fee : </div>
-                                        <div>{result[0][13]}  </div>
+                                        <div>Transactions Fee : </div><div>{tx[0][10]} Ether </div>
                                     </div>
                                 </div>
                             )

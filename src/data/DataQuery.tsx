@@ -11,5 +11,6 @@ export async function getAll(queryProps: string) {
     };
 
     const result: QueryResultSet = await flipside.query.run(query);
+    console.log(result)
     return result?.rows || []
 }
