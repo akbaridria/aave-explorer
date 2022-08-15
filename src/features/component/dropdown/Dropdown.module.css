@@ -18,7 +18,7 @@
     box-shadow: 0 0 1px rgb(14 14 44 / 4%), 0 2px 4px rgb(96 97 112 / 16%);
     border-radius: 8px;
     display: block;
-    z-index: 1;
+    z-index: 100;
     min-width: 127px;
     display: grid;
     gap: 12px;

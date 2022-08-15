@@ -16,6 +16,7 @@ import {
 } from '../data/RawQuery'
 import { Oval } from 'react-loader-spinner'
 import { Logs } from '../features/component/card/txhash/Logs'
+import { Erc20flows } from '../features/component/card/txhash/Erc20Flows'
 
 
 export function Txhash() {
@@ -82,20 +83,23 @@ export function Txhash() {
                     /> {loadingProgress}</div> </>
                 ) : (
                     result.length > 0 ? (
-                            <div className={styles.wrapper}>
-                                <div style={{ fontWeight: 'bold', fontSize: '20px', padding: '12px 12px 24px 12px' }}>Transaction Details</div>
-                                <div className={styles.tab}>
-                                    <div onClick={() => setClickTab('Overview')} className={clickTab === 'Overview' ? styles.activeTab : styles.inActiveTab}>Overview</div>
-                                    <div onClick={() => setClickTab('Logs')} className={clickTab === 'Logs' ? styles.activeTab : styles.inActiveTab}>Logs ({dataLogs.length})</div>
-                                </div>
-                                {
-                                    clickTab === 'Overview' ? (
-                                        <Overview isLoading={isLoading} tx={tx} result={result} tokenTransfers={tokenTransfers} />
-                                    ) : clickTab === 'Logs' ? (
-                                        <Logs dataLogs={dataLogs} />
-                                    ) : null
-                                }
+                        <div className={styles.wrapper}>
+                            <div style={{ fontWeight: 'bold', fontSize: '20px', padding: '12px 12px 24px 12px' }}>Transaction Details</div>
+                            <div className={styles.tab}>
+                                <div onClick={() => setClickTab('Overview')} className={clickTab === 'Overview' ? styles.activeTab : styles.inActiveTab}>Overview</div>
+                                <div onClick={() => setClickTab('Logs')} className={clickTab === 'Logs' ? styles.activeTab : styles.inActiveTab}>Logs ({dataLogs.length})</div>
+                                <div onClick={() => setClickTab('erc20flows')} className={clickTab === 'erc20flows' ? styles.activeTab : styles.inActiveTab}>ERC-20 Flow</div>
                             </div>
+                            {
+                                clickTab === 'Overview' ? (
+                                    <Overview isLoading={isLoading} tx={tx} result={result} tokenTransfers={tokenTransfers} />
+                                ) : clickTab === 'Logs' ? (
+                                    <Logs dataLogs={dataLogs} />
+                                ) : clickTab === 'erc20flows' ? (
+                                    <Erc20flows dataTransfers={tokenTransfers} />
+                                ) : null
+                            }
+                        </div>
                     ) : (
 
                         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '32px' }}>

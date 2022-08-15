@@ -6,7 +6,7 @@
     box-shadow: 0 1px 10px rgb(151 164 175 / 10%);
     position: fixed;
     width: 100%;
-    z-index: 1;
+    z-index: 100;
 }
 
 .row {
