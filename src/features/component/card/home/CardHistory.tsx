@@ -42,7 +42,7 @@ export function CardHistory({ query, title }: { query: string, title: string }) 
                         {result.map((item, id) => {
                             return (
                                 <>
-                                    <div key={id} className={styles.listTx}>
+                                    <div key={id + title} className={styles.listTx}>
                                         <div className={styles.iconTX}>
                                             Tx
                                         </div>
@@ -70,7 +70,7 @@ export function CardHistory({ query, title }: { query: string, title: string }) 
                                             </div>
                                         </div>
                                         <div style={{ textAlign: 'right' }}>
-                                            {(item[6] as number).toFixed(2).replace(/(\d)(?=(\d{3})+(?:\.\d+)?$)/g, "$1,")} <span style={{ color: '#3498db' }}>${item[4]}</span>
+                                            {Intl.NumberFormat().format(item[6])} <span style={{ color: '#3498db' }}>${item[4]}</span>
                                         </div>
                                     </div>
                                     <hr className={styles.customHr} />

@@ -650,34 +650,18 @@ export function queryFlashLoan(id: string) {
 }
 
 export function queryLiquidation(id: string) {
-  const query = `with data_price as (
-    select
-        hour::date as date,
-        token_address,
-        symbol,
-        decimals,
-        avg(price) as price
-    from
-        ethereum.core.fact_hourly_token_prices
-    group by 1, 2, 3, 4
-  )
-  , data_liquidation as (
+  const query = `with data_liquidation as (
     select
       a.block_number,
       a.tx_hash,
       a.block_timestamp,
       a.origin_from_address as address,
-      b.symbol,
-      b.token_address as token_address,
-      try_to_number(a.event_inputs:liquidatedCollateralAmount::string)/pow(10, b.decimals) as amount,
-      (try_to_number(a.event_inputs:liquidatedCollateralAmount::string)/pow(10, b.decimals))*b.price as amount_usd,
-        c.symbol as symbol1,
-        try_to_number(a.event_inputs:debtToCover::string)/pow(10, c.decimals) as amount1,
-        (try_to_number(a.event_inputs:debtToCover::string)/pow(10, c.decimals))*c.price as amount_usd1,
-        'Liquidation' as action
-    from ethereum.core.fact_event_logs a join data_price b on a.block_timestamp::date = b.date
-    and a.event_inputs:collateralAsset = b.token_address
-    join data_price c on a.event_inputs:debtAsset = c.token_address 
+  	  a.event_inputs:debtAsset as token_address1,
+  	  a.event_inputs:collateralAsset as token_address,
+  	  try_to_number(a.event_inputs:liquidatedCollateralAmount::string) as amount,
+  	  try_to_number(a.event_inputs:debtToCover::string) as amount1,
+      'Liquidation' as action
+    from ethereum.core.fact_event_logs a
     where
         a.contract_address = '0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9'
     and
@@ -685,7 +669,39 @@ export function queryLiquidation(id: string) {
     and
       a.tx_hash = '${id}'
   )
-  select * from data_liquidation`
+  , data_price as (
+    select
+    	token_address,
+    	symbol,
+    	decimals,
+    	avg(price) as price
+    from
+    	ethereum.core.fact_hourly_token_prices
+    where
+    (
+    	token_address in (select token_address from data_liquidation)
+    or
+    	token_address in (select token_address1 from data_liquidation)
+    )
+    and
+    	hour::date = (select block_timestamp::date from data_liquidation)
+    group by 1, 2, 3
+  )
+  select 
+  	block_number,
+  	block_timestamp,
+  	tx_hash,
+  	address,
+  	b.symbol,
+  	b.token_address,
+  	a.amount/pow(10, b.decimals) as amount,
+  	(a.amount/pow(10, b.decimals))*b.price as amount_usd,
+  	c.symbol as symbol1,
+  	a.amount1/pow(10, c.decimals) as amount1,
+  	(a.amount1/pow(10, c.decimals))*c.price as amount_usd1,
+  	action
+  from data_liquidation a left join data_price b on a.token_address = b.token_address
+  left join data_price c on a.token_address1 = c.token_address`
 
   return query
 }

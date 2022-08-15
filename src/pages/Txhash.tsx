@@ -25,7 +25,7 @@ export function Txhash() {
     const [tx, setTx] = useState([[]])
     const [dataLogs, setDataLogs] = useState([[]])
     const [clickTab, setClickTab] = useState('Overview')
-
+    const [loadingProgress, setLoadingProgress] = useState('')
 
     let id: any = useParams().id
 
@@ -33,17 +33,26 @@ export function Txhash() {
 
         const getValues = async () => {
             setLoading(true)
+            setLoadingProgress('Getting Query Borrow')
             const d = await getAll(queryBorrow(id))
+            setLoadingProgress('Getting Query Supply')
             const e = await getAll(querySupply(id))
+            setLoadingProgress('Getting Query Withdraw')
             const f = await getAll(queryWithdraw(id))
+            setLoadingProgress('Getting Query Repay')
             const g = await getAll(queryRepay(id))
+            setLoadingProgress('Getting Query FlashLoan')
             const h = await getAll(queryFlashLoan(id))
+            setLoadingProgress('Getting Query Liquidation')
             const i = await getAll(queryLiquidation(id))
             const temp = [...d, ...e, ...f, ...g, ...h, ...i]
             setResult(temp as any[])
             if (temp.length > 0) {
+                setLoadingProgress('Getting Query Tx')
                 const i = await getAll(queryTx(id))
+                setLoadingProgress('Getting Query Token Transfers')
                 const j = await getAll(queryTokenTransfer(id))
+                setLoadingProgress('Getting Query Event Logs')
                 const h = await getAll(queryEventLogs(id))
                 setTokenTransfers(j as any[])
                 setTx(i as any)
@@ -70,7 +79,7 @@ export function Txhash() {
                         secondaryColor="#3498db"
                         strokeWidth={2}
                         strokeWidthSecondary={2}
-                    /> Refresh The Page If Loading Take Too Long!</div> </>
+                    /> {loadingProgress}</div> </>
                 ) : (
                     result.length > 0 ? (
                             <div className={styles.wrapper}>
